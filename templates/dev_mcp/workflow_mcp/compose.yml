@@ -1,0 +1,24 @@
+services:
+  workflow_mcp:
+    build:
+      context: ./docker
+      dockerfile: Dockerfile
+    working_dir: /workspace/dev_mcp/workflow_mcp
+    user: "${WORKFLOW_MCP_UID:-1000}:${WORKFLOW_MCP_GID:-1000}"
+    environment:
+      WORKFLOW_MCP_PORT: "${WORKFLOW_MCP_PORT:-8765}"
+      WORKFLOW_MCP_PROJECT_ROOT: /workspace
+      UV_CACHE_DIR: /workspace/_cache/workflow_mcp_uv_cache
+      UV_PROJECT_ENVIRONMENT: /workspace/_cache/workflow_mcp_uv_venv
+      UV_PYTHON_INSTALL_DIR: /workspace/_cache/workflow_mcp_uv_python
+      PYTHONDONTWRITEBYTECODE: "1"
+    ports:
+      - "127.0.0.1:${WORKFLOW_MCP_PORT:-8765}:${WORKFLOW_MCP_PORT:-8765}"
+    volumes:
+      - ../..:/workspace:ro
+      - ../../feedbacks:/workspace/feedbacks
+      - ../../rejected_feedbacks:/workspace/rejected_feedbacks
+      - ../../_cache/workflow_mcp_uv_cache:/workspace/_cache/workflow_mcp_uv_cache
+      - ../../_cache/workflow_mcp_uv_venv:/workspace/_cache/workflow_mcp_uv_venv
+      - ../../_cache/workflow_mcp_uv_python:/workspace/_cache/workflow_mcp_uv_python
+    command: ["/bin/sh", "/workspace/dev_mcp/workflow_mcp/setup.sh"]
